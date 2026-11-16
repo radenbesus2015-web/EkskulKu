@@ -49,4 +49,3 @@ export function tambahPendaftar(data: Omit<Pendaftar, "nomor">) {
   pendaftar.push({ nomor: nomorTerakhir, ...data });
   return nomorTerakhir;
 }
-
