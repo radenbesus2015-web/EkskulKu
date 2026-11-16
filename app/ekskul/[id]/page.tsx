@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ambilEkskul } from "@/data/ambil";
@@ -6,7 +5,8 @@ import { ekskul, JAM_SESI } from "@/data/ekskul";
 import Link from "next/link";
 import AnggotaEkskul from "@/components/AnggotaEkskul";
 import FormDaftar from "@/components/FormDaftar";
-import { cookies } from "next/headers";
+import { Suspense } from "react";
+import FormDaftarWithCookies from "@/components/FormDaftarWithCookies";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -40,17 +40,13 @@ export default async function DetailEkskul({ params }: Props) {
     notFound();
   }
 
-  const cookieStore = await cookies();
-  const namaAwal = cookieStore.get("nama")?.value ?? "";
-  const kelasAwal = cookieStore.get("kelas")?.value ?? "";
-
   return (
     <div className="space-y-6">
       <Link href="/ekskul" className="text-sm font-medium text-blue-600 hover:underline">
         ← Kembali ke Daftar Ekskul
       </Link>
 
-      {/* Informasi Ekskul */}
+      {/* Informasi Ekskul (Tampil lebih dulu) */}
       <article className="rounded-xl border bg-white p-6 shadow-sm">
         <span className="rounded bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-700">
           {item.kategori}
@@ -65,24 +61,14 @@ export default async function DetailEkskul({ params }: Props) {
         </p>
       </article>
 
-      {/* Formulir Pendaftaran */}
-      <FormDaftar
-        ekskulId={item.id}
-        namaAwal={namaAwal}
-        kelasAwal={kelasAwal}
-      />
+      {/* Formulir Pendaftaran dibungkus Suspense untuk cookies */}
+      <Suspense fallback={<div className="h-64 rounded-xl border bg-white p-6 animate-pulse" />}>
+        <FormDaftarWithCookies ekskulId={item.id} />
+      </Suspense>
 
       {/* Anggota terdaftar dibungkus Suspense */}
       <section className="rounded-xl border bg-white p-6 shadow-sm">
-        <Suspense
-          fallback={
-            <div className="py-6 text-center text-sm font-medium text-slate-500 animate-pulse">
-              Memuat anggota...
-            </div>
-          }
-        >
-          <AnggotaEkskul ekskulId={item.id} kuota={item.kuota} />
-        </Suspense>
+        <AnggotaEkskul ekskulId={item.id} kuota={item.kuota} />
       </section>
     </div>
   );

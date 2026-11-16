@@ -1,12 +1,13 @@
 import { ambilAnggota } from "@/data/ambil";
 import { cookies } from "next/headers";
+import { Suspense } from "react";
 
 type Props = {
   ekskulId: number;
   kuota: number;
 };
 
-export default async function AnggotaEkskul({ ekskulId, kuota }: Props) {
+async function DaftarAnggotaInternal({ ekskulId, kuota }: Props) {
   const anggota = await ambilAnggota(ekskulId);
   const cookieStore = await cookies();
   const namaDiCookie = cookieStore.get("nama")?.value?.trim().toLowerCase();
@@ -53,3 +54,16 @@ export default async function AnggotaEkskul({ ekskulId, kuota }: Props) {
   );
 }
 
+export default function AnggotaEkskul({ ekskulId, kuota }: Props) {
+  return (
+    <Suspense
+      fallback={
+        <div className="py-6 text-center text-sm font-medium text-slate-500 animate-pulse">
+          Memuat anggota...
+        </div>
+      }
+    >
+      <DaftarAnggotaInternal ekskulId={ekskulId} kuota={kuota} />
+    </Suspense>
+  );
+}
