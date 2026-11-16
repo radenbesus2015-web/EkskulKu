@@ -4,7 +4,6 @@ import { ambilEkskul } from "@/data/ambil";
 import { ekskul, JAM_SESI } from "@/data/ekskul";
 import Link from "next/link";
 import AnggotaEkskul from "@/components/AnggotaEkskul";
-import FormDaftar from "@/components/FormDaftar";
 import { Suspense } from "react";
 import FormDaftarWithCookies from "@/components/FormDaftarWithCookies";
 

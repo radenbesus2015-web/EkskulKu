@@ -12,11 +12,12 @@ type Props = {
   searchParams: Promise<{
     kategori?: string;
     hari?: string;
+    sisa?: string;
   }>;
 };
 
 export default async function HalamanEkskul({ searchParams }: Props) {
-  const { kategori, hari } = await searchParams;
+  const { kategori, hari, sisa } = await searchParams;
 
   const semuaEkskul = await ambilSemuaEkskul();
 
@@ -29,11 +30,20 @@ export default async function HalamanEkskul({ searchParams }: Props) {
   const hariValid =
     hari && DAFTAR_HARI.includes(hari) ? hari : undefined;
 
+  const filterHanyaAdaSisa = sisa === "1";
+
   // Saringan bekerja bersamaan di sisi server
   const hasilSaring = semuaEkskul.filter((item) => {
     const cocokKategori = kategoriValid ? item.kategori === kategoriValid : true;
     const cocokHari = hariValid ? item.hari === hariValid : true;
-    return cocokKategori && cocokHari;
+
+    let cocokSisa = true;
+    if (filterHanyaAdaSisa) {
+      const terisi = pendaftar.filter((p) => p.ekskulId === item.id).length;
+      cocokSisa = item.kuota - terisi > 0;
+    }
+
+    return cocokKategori && cocokHari && cocokSisa;
   });
 
   return (
@@ -43,6 +53,7 @@ export default async function HalamanEkskul({ searchParams }: Props) {
       <FormulirSaringan
         kategoriTerpilih={kategoriValid ?? "Semua kategori"}
         hariTerpilih={hariValid ?? "Semua hari"}
+        sisaTerpilih={filterHanyaAdaSisa}
       />
 
       <p className="mb-4 text-sm font-medium text-slate-600">

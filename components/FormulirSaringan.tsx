@@ -6,21 +6,27 @@ import { DAFTAR_KATEGORI, DAFTAR_HARI } from "@/data/ekskul";
 type Props = {
   kategoriTerpilih: string;
   hariTerpilih: string;
+  sisaTerpilih: boolean;
 };
 
 export default function FormulirSaringan({
   kategoriTerpilih,
   hariTerpilih,
+  sisaTerpilih,
 }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  function perbaruiURL(namaParam: string, nilai: string) {
+  function perbaruiURL(namaParam: string, nilai: string | boolean) {
     const params = new URLSearchParams(searchParams.toString());
-    if (!nilai || nilai === "Semua kategori" || nilai === "Semua hari") {
+    if (
+      !nilai ||
+      nilai === "Semua kategori" ||
+      nilai === "Semua hari"
+    ) {
       params.delete(namaParam);
     } else {
-      params.set(namaParam, nilai);
+      params.set(namaParam, String(nilai));
     }
     const query = params.toString();
     router.push(query ? `/ekskul?${query}` : "/ekskul");
@@ -65,7 +71,19 @@ export default function FormulirSaringan({
           ))}
         </select>
       </div>
+
+      {/* Saringan bonus: Masih ada tempat */}
+      <div className="flex items-center gap-2 self-end pb-2">
+        <label className="flex cursor-pointer items-center gap-2 text-sm font-medium text-slate-700">
+          <input
+            type="checkbox"
+            checked={sisaTerpilih}
+            onChange={(e) => perbaruiURL("sisa", e.target.checked ? "1" : "")}
+            className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+          />
+          Hanya yang masih ada tempat
+        </label>
+      </div>
     </div>
   );
 }
-

@@ -87,6 +87,23 @@ export async function daftarEkskul(
     };
   }
 
+  // Bonus 2: Maksimal mengikuti 2 ekskul, ekskul ketiga ditolak
+  const totalEkskulDiikuti = pendaftar.filter(
+    (p) =>
+      p.nama.toLowerCase() === namaLower &&
+      p.kelas.toLowerCase() === kelasLower
+  ).length;
+
+  if (totalEkskulDiikuti >= 2) {
+    const pesanGalat = `Kamu sudah mengikuti 2 ekskul. Maksimal hanya boleh mengikuti 2 ekstrakurikuler.`;
+    return {
+      berhasil: false,
+      pesan: pesanGalat,
+      galat: { umum: pesanGalat },
+      isian,
+    };
+  }
+
   // 3. Validasi kuota penuh
   const jumlahAnggota = pendaftar.filter((p) => p.ekskulId === targetEkskul.id).length;
   if (jumlahAnggota >= targetEkskul.kuota) {
